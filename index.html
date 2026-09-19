@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIEW Speed Racer</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top,#172554,#020617 65%);
+    font-family:Arial,Helvetica,sans-serif;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.game{
+    width:100%;
+    max-width:520px;
+    text-align:center;
+}
+
+.logo{
+    font-size:32px;
+    font-weight:900;
+    letter-spacing:2px;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    color:#94a3b8;
+    margin-bottom:15px;
+}
+
+.panel{
+    background:rgba(15,23,42,.95);
+    border:1px solid #334155;
+    border-radius:22px;
+    padding:15px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+    margin-bottom:12px;
+}
+
+.stat{
+    background:#111827;
+    border-radius:12px;
+    padding:9px 4px;
+}
+
+.stat small{
+    display:block;
+    color:#94a3b8;
+    font-size:10px;
+    margin-bottom:3px;
+}
+
+.stat strong{
+    font-size:17px;
+}
+
+.track{
+    position:relative;
+    width:100%;
+    max-width:360px;
+    height:570px;
+    margin:auto;
+    overflow:hidden;
+    border-radius:18px;
+    border:4px solid #475569;
+    background:#343941;
+}
+
+.road{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(
+            90deg,
+            #20242a 0%,
+            #3f444b 8%,
+            #343941 8%,
+            #343941 92%,
+            #3f444b 92%,
+            #20242a 100%
+        );
+}
+
+.edge{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:5px;
+    background:#f8fafc;
+}
+
+.edge.left{
+    left:8%;
+}
+
+.edge.right{
+    right:8%;
+}
+
+.lane{
+    position:absolute;
+    top:-120px;
+    bottom:-120px;
+    width:5px;
+    background:repeating-linear-gradient(
+        to bottom,
+        #f8fafc 0px,
+        #f8fafc 55px,
+        transparent 55px,
+        transparent 115px
+    );
+}
+
+.lane.one{
+    left:35%;
+}
+
+.lane.two{
+    left:65%;
+}
+
+.car{
+    position:absolute;
+    width:52px;
+    height:88px;
+    bottom:28px;
+    left:calc(50% - 26px);
+    border-radius:14px 14px 9px 9px;
+    background:
+        linear-gradient(
+            90deg,
+            #991b1b,
+            #ef4444 45%,
+            #b91c1c
+        );
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.7);
+    z-index:10;
+}
+
+.car:before{
+    content:"";
+    position:absolute;
+    left:8px;
+    right:8px;
+    top:12px;
+    height:28px;
+    border-radius:8px;
+    background:#bae6fd;
+    border:2px solid #e0f2fe;
+}
+
+.car:after{
+    content:"VIEW";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:12px;
+    font-size:8px;
+    font-weight:900;
+}
+
+.enemy{
+    position:absolute;
+    width:50px;
+    height:82px;
+    border-radius:13px 13px 8px 8px;
+    background:
+        linear-gradient(
+            90deg,
+            #1e3a8a,
+            #3b82f6,
+            #1d4ed8
+        );
+    box-shadow:0 7px 16px rgba(0,0,0,.6);
+    z-index:8;
+}
+
+.enemy:before{
+    content:"";
+    position:absolute;
+    left:8px;
+    right:8px;
+    top:11px;
+    height:27px;
+    border-radius:8px;
+    background:#bae6fd;
+}
+
+.coin{
+    position:absolute;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:linear-gradient(#fde047,#f59e0b);
+    border:3px solid #fff7ae;
+    box-shadow:0 0 12px #facc15;
+    z-index:7;
+}
+
+.coin:after{
+    content:"$";
+    color:#854d0e;
+    font-weight:900;
+    font-size:16px;
+}
+
+.message{
+    min-height:28px;
+    margin:10px 0;
+    color:#cbd5e1;
+    font-weight:700;
+}
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    gap:9px;
+    flex-wrap:wrap;
+}
+
+button{
+    min-height:46px;
+    border:none;
+    border-radius:12px;
+    padding:0 18px;
+    font-weight:800;
+    cursor:pointer;
+    background:#1e293b;
+    color:white;
+    border:1px solid #475569;
+}
+
+button:hover{
+    background:#334155;
+}
+
+.start{
+    background:#2563eb;
+}
+
+.start:hover{
+    background:#1d4ed8;
+}
+
+.control-area{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    margin-top:14px;
+}
+
+.control{
+    width:80px;
+    height:58px;
+    font-size:25px;
+    background:#0f172a;
+}
+
+.help{
+    color:#64748b;
+    font-size:12px;
+    margin-top:12px;
+}
+
+.gameover{
+    position:absolute;
+    inset:0;
+    background:rgba(2,6,23,.88);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+}
+
+.gameover.show{
+    display:flex;
+}
+
+.overbox{
+    background:#0f172a;
+    border:1px solid #475569;
+    border-radius:20px;
+    padding:25px;
+    width:85%;
+}
+
+.overbox h2{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.finalscore{
+    font-size:22px;
+    margin-bottom:18px;
+}
+
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+    }
+
+    .logo{
+        font-size:25px;
+    }
+
+    .track{
+        height:500px;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .control{
+        width:95px;
+        height:60px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <div class="logo">🏁 VIEW SPEED RACER</div>
+    <div class="subtitle">Drive • Dodge • Collect • Win</div>
+
+    <div class="panel">
+
+        <div class="stats">
+
+            <div class="stat">
+                <small>SCORE</small>
+                <strong id="score">0</strong>
+            </div>
+
+            <div class="stat">
+                <small>COINS</small>
+                <strong id="coins">0</strong>
+            </div>
+
+            <div class="stat">
+                <small>LEVEL</small>
+                <strong id="level">1</strong>
+            </div>
+
+            <div class="stat">
+                <small>LIVES</small>
+                <strong id="lives">❤️❤️❤️</strong>
+            </div>
+
+        </div>
+
+        <div class="track" id="track">
+
+            <div class="road"></div>
+
+            <div class="edge left"></div>
+            <div class="edge right"></div>
+
+            <div class="lane one"></div>
+            <div class="lane two"></div>
+
+            <div class="car" id="player"></div>
+
+            <div class="gameover" id="gameover">
+
+                <div class="overbox">
+
+                    <h2>🏁 GAME OVER</h2>
+
+                    <div class="finalscore">
+                        Score: <span id="finalScore">0</span>
+                    </div>
+
+                    <button class="start" id="restartGame">
+                        🔄 PLAY AGAIN
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="message" id="message">
+            Press START to begin your race!
+        </div>
+
+        <div class="buttons">
+
+            <button class="start" id="startGame">
+                ▶ START
+            </button>
+
+            <button id="pauseGame">
+                ⏸ PAUSE
+            </button>
+
+            <button id="soundGame">
+                🔊 SOUND
+            </button>
+
+        </div>
+
+        <div class="control-area">
+
+            <button class="control" id="leftButton">
+                ◀
+            </button>
+
+            <button class="control" id="rightButton">
+                ▶
+            </button>
+
+        </div>
+
+        <div class="help">
+            Computer: ← → keys | Mobile: Use buttons
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const track = document.getElementById("track");
+const player = document.getElementById("player");
+
+const scoreEl = document.getElementById("score");
+const coinsEl = document.getElementById("coins");
+const levelEl = document.getElementById("level");
+const livesEl = document.getElementById("lives");
+
+const message = document.getElementById("message");
+
+const startGame = document.getElementById("startGame");
+const pauseGame = document.getElementById("pauseGame");
+const soundGame = document.getElementById("soundGame");
+
+const leftButton = document.getElementById("leftButton");
+const rightButton = document.getElementById("rightButton");
+
+const gameover = document.getElementById("gameover");
+const finalScore = document.getElementById("finalScore");
+const restartGame = document.getElementById("restartGame");
+
+let running = false;
+let paused = false;
+
+let score = 0;
+let coins = 0;
+let lives = 3;
+let level = 1;
+
+let playerX = 50;
+
+let enemies = [];
+let coinObjects = [];
+
+let animationID = null;
+let lastTime = 0;
+let enemyTimer = 0;
+let coinTimer = 0;
+
+let speed = 190;
+
+let soundOn = true;
+
+
+/* PLAYER */
+
+function movePlayer(direction){
+
+    if(!running || paused){
+        return;
+    }
+
+    playerX += direction * 8;
+
+    if(playerX < 15){
+        playerX = 15;
+    }
+
+    if(playerX > 85){
+        playerX = 85;
+    }
+
+    player.style.left =
+        "calc(" + playerX + "% - 26px)";
+}
+
+
+/* START */
+
+function start(){
+
+    stopAnimation();
+
+    enemies.forEach(e => e.element.remove());
+    coinObjects.forEach(c => c.element.remove());
+
+    enemies = [];
+    coinObjects = [];
+
+    score = 0;
+    coins = 0;
+    lives = 3;
+    level = 1;
+
+    speed = 190;
+
+    playerX = 50;
+
+    running = true;
+    paused = false;
+
+    player.style.left = "calc(50% - 26px)";
+
+    scoreEl.textContent = score;
+    coinsEl.textContent = coins;
+    levelEl.textContent = level;
+
+    updateLives();
+
+    gameover.classList.remove("show");
+
+    message.textContent =
+        "🏎️ Race started! Avoid the traffic.";
+
+    lastTime = performance.now();
+
+    animationID =
+        requestAnimationFrame(gameLoop);
+}
+
+
+/* PAUSE */
+
+function togglePause(){
+
+    if(!running){
+        return;
+    }
+
+    paused = !paused;
+
+    if(paused){
+
+        message.textContent =
+            "⏸ Game Paused";
+
+        pauseGame.textContent =
+            "▶ RESUME";
+
+    }else{
+
+        message.textContent =
+            "🏎️ Keep Racing!";
+
+        pauseGame.textContent =
+            "⏸ PAUSE";
+
+        lastTime = performance.now();
+
+        animationID =
+            requestAnimationFrame(gameLoop);
+    }
+}
+
+
+/* SOUND */
+
+function toggleSound(){
+
+    soundOn = !soundOn;
+
+    soundGame.textContent =
+        soundOn ? "🔊 SOUND" : "🔇 SOUND OFF";
+}
+
+
+/* CREATE ENEMY */
+
+function createEnemy(){
+
+    const element =
+        document.createElement("div");
+
+    element.className = "enemy";
+
+    const lanes = [20,50,80];
+
+    const lane =
+        lanes[Math.floor(Math.random()*lanes.length)];
+
+    element.style.left =
+        "calc(" + lane + "% - 25px)";
+
+    element.style.top = "-100px";
+
+    track.appendChild(element);
+
+    enemies.push({
+
+        element: element,
+        x: lane,
+        y: -100
+
+    });
+}
+
+
+/* CREATE COIN */
+
+function createCoin(){
+
+    const element =
+        document.createElement("div");
+
+    element.className = "coin";
+
+    const lanes = [20,50,80];
+
+    const lane =
+        lanes[Math.floor(Math.random()*lanes.length)];
+
+    element.style.left =
+        "calc(" + lane + "% - 14px)";
+
+    element.style.top = "-40px";
+
+    track.appendChild(element);
+
+    coinObjects.push({
+
+        element: element,
+        x: lane,
+        y: -40
+
+    });
+}
+
+
+/* COLLISION */
+
+function collision(
+    playerX,
+    playerY,
+    objectX,
+    objectY,
+    width
+){
+
+    const horizontal =
+        Math.abs(playerX-objectX) < width;
+
+    const vertical =
+        Math.abs(playerY-objectY) < 65;
+
+    return horizontal && vertical;
+}
+
+
+/* LIVES */
+
+function updateLives(){
+
+    let text = "";
+
+    for(let i=0;i<lives;i++){
+
+        text += "❤️";
+
+    }
+
+    livesEl.textContent = text || "💔";
+}
+
+
+/* LEVEL */
+
+function updateLevel(){
+
+    level =
+        Math.floor(score / 10) + 1;
+
+    levelEl.textContent = level;
+
+    speed =
+        190 + (level-1)*25;
+
+}
+
+
+/* GAME OVER */
+
+function endGame(){
+
+    running = false;
+    paused = false;
+
+    stopAnimation();
+
+    finalScore.textContent = score;
+
+    gameover.classList.add("show");
+
+    message.textContent =
+        "Race finished! Try again.";
+
+}
+
+
+/* GAME LOOP */
+
+function gameLoop(time){
+
+    if(!running || paused){
+
+        return;
+
+    }
+
+    const delta =
+        Math.min(
+            0.035,
+            (time-lastTime)/1000
+        );
+
+    lastTime = time;
+
+    enemyTimer += delta;
+    coinTimer += delta;
+
+
+    /* CREATE TRAFFIC */
+
+    const enemyDelay =
+        Math.max(
+            0.38,
+            0.9 - level*0.04
+        );
+
+    if(enemyTimer > enemyDelay){
+
+        enemyTimer = 0;
+
+        createEnemy();
+
+    }
+
+
+    /* CREATE COINS */
+
+    if(coinTimer > 1.3){
+
+        coinTimer = 0;
+
+        createCoin();
+
+    }
+
+
+    /* MOVE ENEMIES */
+
+    for(let i=enemies.length-1;i>=0;i--){
+
+        const enemy =
+            enemies[i];
+
+        enemy.y += speed * delta;
+
+        enemy.element.style.top =
+            enemy.y + "px";
+
+
+        if(
+            collision(
+                playerX,
+                track.clientHeight-70,
+                enemy.x,
+                enemy.y,
+                12
+            )
+        ){
+
+            enemy.element.remove();
+
+            enemies.splice(i,1);
+
+            lives--;
+
+            updateLives();
+
+            message.textContent =
+                "💥 Collision! Be careful!";
+
+            if(lives <= 0){
+
+                endGame();
+
+                return;
+
+            }
+
+            continue;
+
+        }
+
+
+        if(
+            enemy.y >
+            track.clientHeight + 100
+        ){
+
+            enemy.element.remove();
+
+            enemies.splice(i,1);
+
+            score++;
+
+            scoreEl.textContent = score;
+
+            updateLevel();
+
+        }
+
+    }
+
+
+    /* MOVE COINS */
+
+    for(let i=coinObjects.length-1;i>=0;i--){
+
+        const coin =
+            coinObjects[i];
+
+        coin.y += speed * delta;
+
+        coin.element.style.top =
+            coin.y + "px";
+
+
+        if(
+            collision(
+                playerX,
+                track.clientHeight-70,
+                coin.x,
+                coin.y,
+                14
+            )
+        ){
+
+            coin.element.remove();
+
+            coinObjects.splice(i,1);
+
+            coins++;
+
+            score += 3;
+
+            coinsEl.textContent =
+                coins;
+
+            scoreEl.textContent =
+                score;
+
+            message.textContent =
+                "🪙 Coin collected! +3";
+
+            updateLevel();
+
+            continue;
+
+        }
+
+
+        if(
+            coin.y >
+            track.clientHeight + 50
+        ){
+
+            coin.element.remove();
+
+            coinObjects.splice(i,1);
+
+        }
+
+    }
+
+
+    animationID =
+        requestAnimationFrame(gameLoop);
+
+}
+
+
+/* STOP */
+
+function stopAnimation(){
+
+    if(animationID){
+
+        cancelAnimationFrame(
+            animationID
+        );
+
+        animationID = null;
+
+    }
+
+}
+
+
+/* BUTTONS */
+
+startGame.addEventListener(
+    "click",
+    start
+);
+
+restartGame.addEventListener(
+    "click",
+    start
+);
+
+pauseGame.addEventListener(
+    "click",
+    togglePause
+);
+
+soundGame.addEventListener(
+    "click",
+    toggleSound
+);
+
+leftButton.addEventListener(
+    "click",
+    function(){
+        movePlayer(-1);
+    }
+);
+
+rightButton.addEventListener(
+    "click",
+    function(){
+        movePlayer(1);
+    }
+);
+
+
+/* KEYBOARD */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "ArrowLeft"){
+
+            event.preventDefault();
+
+            movePlayer(-1);
+
+        }
+
+        if(event.key === "ArrowRight"){
+
+            event.preventDefault();
+
+            movePlayer(1);
+
+        }
+
+        if(
+            event.key === " " &&
+            running
+        ){
+
+            event.preventDefault();
+
+            togglePause();
+
+        }
+
+    }
+);
+
+
+/* MOBILE SWIPE */
+
+let touchStartX = 0;
+
+track.addEventListener(
+    "touchstart",
+    function(event){
+
+        touchStartX =
+            event.touches[0].clientX;
+
+    },
+    {passive:true}
+);
+
+track.addEventListener(
+    "touchend",
+    function(event){
+
+        const endX =
+            event.changedTouches[0].clientX;
+
+        const difference =
+            endX-touchStartX;
+
+        if(Math.abs(difference)>30){
+
+            movePlayer(
+                difference>0 ? 1 : -1
+            );
+
+        }
+
+    },
+    {passive:true}
+);
+
+</script>
+
+</body>
+</html>
